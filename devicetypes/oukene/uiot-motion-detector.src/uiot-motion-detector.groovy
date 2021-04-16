@@ -18,7 +18,7 @@ metadata {
 		fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000,0003,0500,0001,FFFF", manufacturer: "Megaman", model: "PS601/z1", deviceJoinName: "INGENIUM Motion Sensor" //INGENIUM ZB PIR Sensor
 		fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0003, 0500, 0001", outClusters: "0019", manufacturer: "HEIMAN", model: "PIRSensor-N", deviceJoinName: "HEIMAN Motion Sensor" //HEIMAN Motion Sensor
 		fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0001, 0500", outClusters: "0019", manufacturer: "Third Reality, Inc", model: "3RMS16BZ", deviceJoinName: "ThirdReality Motion Sensor" //ThirdReality Motion Sensor
-        fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000 0001 0003 0500", manufacturer: "Konke", model: "3AFE28010402000D", deviceJoinName: "UIOT motion Sensor" //ThirdReality Motion Sensor
+        fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000 0001 0003 0500", manufacturer: "Konke", model: "3AFE28010402000D", deviceJoinName: "UIOT-MM40S" //UIOT Motion Sensor
 	}
     
     command "test"
@@ -110,7 +110,7 @@ def parseIasMessage(ZoneStatus zs) {
 	Boolean motionActive = zs.isAlarm1Set() || zs.isAlarm2Set()
 	if (!supportsRestoreNotify()) {
 		if (motionActive) {
-			def timeout = motionreset ? motionreset : 20
+			def timeout = motionreset ? motionreset : 65
 			log.debug "Stopping motion in ${timeout} seconds"
 			runIn(timeout, stopMotion)
 		}
@@ -132,7 +132,11 @@ def getBatteryPercentageResult(rawValue) {
 		result.translatable = true
 		if (manufacturer == "Third Reality, Inc") {
 			result.value = Math.round(rawValue)
-		} else {
+		} 
+        else if(manufacturer == "Konke") {
+        	result.value = Math.round(rawValue * 6)
+        }
+        else {
 			result.value = Math.round(rawValue / 2)
 		}
 		result.descriptionText = "${device.displayName} battery was ${result.value}%"
@@ -155,11 +159,13 @@ def getMotionResult(value) {
  * */
 def ping() {
 	log.debug "ping "
+    log.debug zigbee.readAttribute(zigbee.IAS_ZONE_CLUSTER, zigbee.ATTRIBUTE_IAS_ZONE_STATUS) + zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021)
 	return zigbee.readAttribute(zigbee.IAS_ZONE_CLUSTER, zigbee.ATTRIBUTE_IAS_ZONE_STATUS) + zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021)
 }
 
 def refresh() {
 	log.debug "Refreshing Values"
+    log.debug zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021)
 	return  zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021) +
 					zigbee.readAttribute(zigbee.IAS_ZONE_CLUSTER,zigbee.ATTRIBUTE_IAS_ZONE_STATUS) +
 					zigbee.enrollResponse()
@@ -173,6 +179,9 @@ def configure() {
 		return zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021, DataType.UINT8, 30, 3600, 0x10) + refresh()
 	} else if (manufacturer == "Third Reality, Inc") {
 		return zigbee.readAttribute(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021)
+    } else if (manufacturer == "Konke") {
+    	sendEvent(name: "checkInterval", value:7800, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
+        return zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021, DataType.UINT8, 30, 1200, 0x10) + refresh()
 	} else {
 		sendEvent(name: "checkInterval", value:20 * 60 + 2*60, displayed: false, data: [protocol: "zigbee", hubHardwareId: device.hub.hardwareID, offlinePingable: "1"])
 		return zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021, DataType.UINT8, 30, 1200, 0x10) + refresh()
@@ -187,4 +196,5 @@ def test() {
     log.debug "outClusters : ${getDataValue("outClusters")}"
     log.debug "model : ${getDataValue("model")}"
     log.debug "deviceJoinName : ${getDataValue("deviceJoinName")}"
+    log.debug "battery : ${devide.battery}"
 }
