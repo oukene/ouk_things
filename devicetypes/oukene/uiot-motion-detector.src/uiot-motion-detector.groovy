@@ -10,7 +10,7 @@ metadata {
 		capability "Configuration"
 		capability "Battery"
 		capability "Refresh"
-		capability "Health Check"
+		//capability "Health Check"
 		capability "Sensor"
 		
 		fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000,0001,0003,0500", outClusters: "0003", manufacturer: "eWeLink", model: "MS01", deviceJoinName: "eWeLink Motion Sensor" //eWeLink Motion Sensor
@@ -20,8 +20,6 @@ metadata {
 		fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000, 0001, 0500", outClusters: "0019", manufacturer: "Third Reality, Inc", model: "3RMS16BZ", deviceJoinName: "ThirdReality Motion Sensor" //ThirdReality Motion Sensor
         fingerprint profileId: "0104", deviceId: "0402", inClusters: "0000 0001 0003 0500", manufacturer: "Konke", model: "3AFE28010402000D", deviceJoinName: "UIOT-MM40S" //UIOT Motion Sensor
 	}
-    
-    command "test"
     
 	simulator {
 		status "active": "zone status 0x0001 -- extended status 0x00"
@@ -134,7 +132,7 @@ def getBatteryPercentageResult(rawValue) {
 			result.value = Math.round(rawValue)
 		} 
         else if(manufacturer == "Konke") {
-        	result.value = Math.round(rawValue * 6)
+        	result.value = Math.round(rawValue * 3)
         }
         else {
 			result.value = Math.round(rawValue / 2)
@@ -187,14 +185,4 @@ def configure() {
 		return zigbee.configureReporting(zigbee.POWER_CONFIGURATION_CLUSTER, 0x0021, DataType.UINT8, 30, 1200, 0x10) + refresh()
 
 	}
-}
-
-def test() {
-	log.debug "profileid : ${getDataValue("profileId")}"
-    log.debug "deviceId : ${getDataValue("deviceId")}"
-    log.debug "inClusters : ${getDataValue("inClusters")}"
-    log.debug "outClusters : ${getDataValue("outClusters")}"
-    log.debug "model : ${getDataValue("model")}"
-    log.debug "deviceJoinName : ${getDataValue("deviceJoinName")}"
-    log.debug "battery : ${devide.battery}"
 }
