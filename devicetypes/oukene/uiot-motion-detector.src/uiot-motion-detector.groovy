@@ -132,7 +132,14 @@ def getBatteryPercentageResult(rawValue) {
 			result.value = Math.round(rawValue)
 		} 
         else if(manufacturer == "Konke") {
-        	result.value = Math.round(rawValue * 3)
+        	def volts = rawValue / 10
+            def minVolts = 2.1
+            def maxVolts = 3.0
+            def pct = (volts - minVolts) / (maxVolts - minVolts)
+            def roundedPct = Math.round(pct * 100)
+            if(roundedPct <=0)
+            	roundedPct = 1
+            result.value = Math.min(100, roundedPct)
         }
         else {
 			result.value = Math.round(rawValue / 2)
