@@ -125,7 +125,7 @@ def pollTrash() {
                 "contentType" : 'application/json'
         ]
 
-        def fare = 0
+        int fare = 0
         def totalQty = 0
         def totalCount = 0
         try {
@@ -164,7 +164,7 @@ def pollTrash() {
                 fare = cal_fare(totalQty)
 
                 log.debug "weight ${totalQty} fare ${fare}"
-
+				fare = fare - fare % 10
                 setWeight(totalQty)
                 setCharge(fare)
                 summury = totalCount + "회, " + totalQty + "kg, " + fare + "원"
