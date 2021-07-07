@@ -167,7 +167,7 @@ def pollTrash() {
 				fare = fare - fare % 10
                 setWeight(totalQty)
                 setCharge(fare)
-                summury = totalCount + "회, " + totalQty + "kg, " + fare + "원"
+                summury = totalCount + "회 / " + totalQty + "kg / " + fare + "원"
                 
             }else{
                 log.warn "retry to pollTrash cause server error try after 10 sec"
