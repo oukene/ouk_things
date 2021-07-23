@@ -13,7 +13,7 @@
  */
 metadata {
     // Automatically generated. Make future change here.
-    definition (name: "RFID Food Trash Meter", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "ade18d01-7284-3428-a874-511a8a065870") {
+    definition (name: "RFID Food Trash Meter", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "1c9d95fb-ac81-3466-8f0a-ebf0dd810c18") {
     	capability "Refresh"
     	capability "monthwander05160.trashmeter"
     }
@@ -139,25 +139,21 @@ def pollTrash() {
                     def pages = respMap.paginationInfo.totalPageCount
 
                     log.debug "total pages >> ${pages}"
-
+                    
                     for(def i = 1 ; i < pages + 1 ; i++){
+                    	params = [
+                                "uri" : "https://www.citywaste.or.kr/portal/status/selectDischargerQuantityQuickMonthNew.do?tagprintcd=${tagId}&aptdong=${aptDong}&apthono=${aptHo}&startchdate=${firstDateStr}&endchdate=${lastDateStr}&pageIndex=${i}",
+                                "contentType" : 'application/json'
+                        ]
+                        respMap = getHttpGetJson(params)
+                    
                         def lists = respMap.list
 
                         for(def j=0;j<lists.size();j++){
                             totalQty += lists[j].qtyvalue
                             log.debug lists[j].dttime + " : " + lists[j].qtyvalue
                         }
-                        if (pages == 1)
-                            break
-
-                        pageIdx = pageIdx + 1
-						params = [
-                                "uri" : "https://www.citywaste.or.kr/portal/status/selectDischargerQuantityQuickMonthNew.do?tagprintcd=${tagId}&aptdong=${aptDong}&apthono=${aptHo}&startchdate=${firstDateStr}&endchdate=${lastDateStr}&pageIndex=${pageIdx}",
-                                "contentType" : 'application/json'
-                        ]
-                        respMap = getHttpGetJson(params)
                     }
-                    pageIdx = 1
                 }else{
                     log.debug "there is no data in this month"
                 }
@@ -168,7 +164,8 @@ def pollTrash() {
                 setWeight(totalQty)
                 setCharge(fare)
                 summury = totalCount + "회 / " + totalQty + "kg / " + fare + "원"
-                
+                def time = new Date().format('yyyy-MM-dd HH:mm:ss', location.getTimeZone())
+                sendEvent(name: "updateTime", value: time, displayed: true)
             }else{
                 log.warn "retry to pollTrash cause server error try after 10 sec"
                 runIn(10, pollTrash)
