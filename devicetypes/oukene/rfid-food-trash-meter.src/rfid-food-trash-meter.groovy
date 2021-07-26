@@ -182,13 +182,16 @@ def pollTrash() {
                 summury = totalCount + "회 / " + totalQty + "kg / " + fare + "원"
                 def time = new Date().format('yyyy-MM-dd HH:mm:ss', location.getTimeZone())
                 setUpdateTime(time)
+                //summury = "error, try later..."
             }else{
                 log.warn "retry to pollTrash cause server error try after 10 sec"
+                summury = "error, try later..."
                 runIn(10, pollTrash)
                 //pollTrash()
             }
         } catch (e) {
             log.error "failed to update $e"
+            summury = "error, try later..."
         }
     }
     else log.error "Missing settings tagId or aptDong or aptHo"
