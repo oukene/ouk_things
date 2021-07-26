@@ -216,6 +216,10 @@ private getHttpGetJson(param) {
 private cal_fare(weight){
     log.debug "cal_fare weight is ${weight} fare late ~20Kg ${under20Kg} 20Kg~30Kg ${beteen20Kg} 30Kg~ ${upper30Kg}"
 
+	if (settings.under20Kg == null || settings.under20Kg == "" ) settings.under20Kg = 187
+    if (settings.beteen20Kg == null || settings.beteen20Kg == "" ) settings.beteen20Kg = 280
+    if (settings.upper30Kg == null || settings.upper30Kg == "" ) settings.upper30Kg = 327
+    
     def sum = 0
     if (weight < 20){
         sum = settings.under20Kg * weight
