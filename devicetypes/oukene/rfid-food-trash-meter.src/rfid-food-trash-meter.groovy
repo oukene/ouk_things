@@ -13,9 +13,9 @@
  */
 metadata {
     // Automatically generated. Make future change here.
-    definition (name: "RFID Food Trash Meter", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "1c9d95fb-ac81-3466-8f0a-ebf0dd810c18") {
+    definition (name: "RFID Food Trash Meter", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "de31accb-5b27-3c27-881d-62d28c64d3ba") {
     	capability "Refresh"
-    	capability "monthwander05160.trashmeter"
+    	capability "orangeboard13471.trashmeter"
     }
     
     preferences {
