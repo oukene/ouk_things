@@ -13,9 +13,9 @@
  */
 metadata {
     // Automatically generated. Make future change here.
-    definition (name: "RFID Food Trash Meter", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "de31accb-5b27-3c27-881d-62d28c64d3ba") {
+    definition (name: "RFID Food Trash Meter", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "c2dfaa20-71c8-3481-933a-d41d5122b43e") {
     	capability "Refresh"
-    	capability "orangeboard13471.trashmeter"
+    	capability "orangeboard13471.rfidfoodtrashmeter"
     }
     
     preferences {
@@ -55,6 +55,7 @@ def initialize() {
     if (settings.upper30Kg == null || settings.upper30Kg == "" ) settings.upper30Kg = 327
    
     refresh()
+    //runEvery1Minutes()
     schedule("0 0 0/1 * * ?", pollTrash)
 }
 
@@ -84,6 +85,12 @@ def setSummury(text)
 {
 	log.debug "setSummury"
 	sendEvent(name: "summury", value: text, displayed: true)
+}
+
+def setUpdateTime(time)
+{
+	log.debug "setUpdateTime"
+    sendEvent(name: "updateTime", value: time, displayed: true)
 }
 
 
@@ -165,7 +172,7 @@ def pollTrash() {
                 setCharge(fare)
                 summury = totalCount + "회 / " + totalQty + "kg / " + fare + "원"
                 def time = new Date().format('yyyy-MM-dd HH:mm:ss', location.getTimeZone())
-                sendEvent(name: "updateTime", value: time, displayed: true)
+                setUpdateTime(time)
             }else{
                 log.warn "retry to pollTrash cause server error try after 10 sec"
                 runIn(10, pollTrash)
