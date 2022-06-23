@@ -22,7 +22,11 @@ metadata {
     preferences {
         input "clientID", "text", type: "text", title: "Client ID", description: "Input Client ID", required: true
         input "clientSecret", "text", title: "Client Secret", description: "Input Client Secret", required: true
-        input "searchKeyword", "text", title: "검색어", description: "검색어", required: true
+        input("sortType", "enum", title: "검색타입", defaultValue: "sim", description: "검색타입", options: [
+                "sim":"유사도순",
+                "asc":"낮은가격순",
+                "dsc": "높은가격순",
+                "date": "등록일자순"])
         input "refreshInterval", "decimal", title: "조회 주기", defaultValue: 60, description: "조회 주기(분)", required: true
     }
 }
@@ -90,7 +94,7 @@ def pollPrice() {
     log.debug "pollTrash()"
     if (clientID && clientSecret) {
         def params = [
-                "uri" : "https://openapi.naver.com/v1/search/shop.json?query=${searchKeyword}&display=1&start=1&sort=sim",
+                "uri" : "https://openapi.naver.com/v1/search/shop.json?query=${device.name}&display=1&start=1&sort=${sortType}",
                 "contentType" : 'application/json',
                 "headers": [
                 	"X-Naver-Client-Id": clientID,
