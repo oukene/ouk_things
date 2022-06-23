@@ -13,10 +13,10 @@
  */
 metadata {
     // Automatically generated. Make future change here.
-    definition (name: "Naver Shopping", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "136c0729-d094-3f81-b8c9-aa912bffb73a") {
-    	capability "Refresh"
+    definition (name: "Naver Shopping", namespace: "oukene", author: "oukene", mnmn: "oukene", vid: "df157cd4-579c-357a-a71e-1b856769aaec") {
     	capability "orangeboard13471.navershopping"
     	capability "orangeboard13471.updatetime"
+        capability "Refresh"
     }
     
     preferences {
